@@ -5,6 +5,7 @@ import customtkinter as ctk
 import skrf as rf
 from tkinter import filedialog, messagebox  # Importamos messagebox desde tkinter
 import numpy as np
+from Graficas import Vizualizer
 
 #Función que selecciona entre cargar o no cargar el archivo s2p
 def toggle_options():
@@ -322,12 +323,12 @@ def save_comp_inf():
                           z_charac=float(i_impedance)
                           )
         try:
-            sim_circuit = circuit.run_simulation()
+            matrix, frequencies = circuit.run_simulation()
         except Exception as e:
             messagebox.showerror("ERROR", f"Ocurrió un error al simular el circuito: {e}")
         else:
             messagebox.showinfo("INFO", f"Se ha simulado el circuito correctamente")
-            print(sim_circuit)
+            Vizualizer(matrix, frequencies)
     else:
         messagebox.showwarning("Advertencia", "No se ha ingresado suficiente información.")
 

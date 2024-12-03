@@ -193,25 +193,25 @@ def plot_mag(matriz_seleccionada, freq):
         fig.suptitle('Magnitud vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, mag_1_1, marker='o', label='Posición (1,1)')
+        axs[0, 0].plot(freq, mag_1_1, marker='.', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Magnitud')
         axs[0, 0].legend()
 
-        axs[0, 1].plot(freq, mag_1_2, marker='o', label='Posición (1,2)')
+        axs[0, 1].plot(freq, mag_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Magnitud')
         axs[0, 1].legend()
 
-        axs[1, 0].plot(freq, mag_2_1, marker='o', label='Posición (2,1)')
+        axs[1, 0].plot(freq, mag_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Magnitud')
         axs[1, 0].legend()
 
-        axs[1, 1].plot(freq, mag_2_2, marker='o', label='Posición (2,2)')
+        axs[1, 1].plot(freq, mag_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Magnitud')
@@ -240,25 +240,25 @@ def plot_Phase(matriz_seleccionada, freq):
         fig.suptitle('Fase vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, Phase_1_1, marker='o', label='Posición (1,1)')
+        axs[0, 0].plot(freq, Phase_1_1, marker='.', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Fase')
         axs[0, 0].legend()
 
-        axs[0, 1].plot(freq, Phase_1_2, marker='o', label='Posición (1,2)')
+        axs[0, 1].plot(freq, Phase_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Fase')
         axs[0, 1].legend()
 
-        axs[1, 0].plot(freq, Phase_2_1, marker='o', label='Posición (2,1)')
+        axs[1, 0].plot(freq, Phase_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Fase')
         axs[1, 0].legend()
 
-        axs[1, 1].plot(freq, Phase_2_2, marker='o', label='Posición (2,2)')
+        axs[1, 1].plot(freq, Phase_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Fase')
@@ -287,25 +287,25 @@ def plot_dB(matriz_seleccionada, freq):
         fig.suptitle('dB vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, dB_1_1, marker='o', label='Posición (1,1)')
+        axs[0, 0].plot(freq, dB_1_1, marker='.', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Fase')
         axs[0, 0].legend()
 
-        axs[0, 1].plot(freq, dB_1_2, marker='o', label='Posición (1,2)')
+        axs[0, 1].plot(freq, dB_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Fase')
         axs[0, 1].legend()
 
-        axs[1, 0].plot(freq, dB_2_1, marker='o', label='Posición (2,1)')
+        axs[1, 0].plot(freq, dB_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Fase')
         axs[1, 0].legend()
 
-        axs[1, 1].plot(freq, dB_2_2, marker='o', label='Posición (2,2)')
+        axs[1, 1].plot(freq, dB_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Fase')
@@ -335,25 +335,25 @@ def plot_real(matriz_seleccionada, freq):
         fig.suptitle('Real vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, real_1_1, marker='o', label='Posición (1,1)')
+        axs[0, 0].plot(freq, real_1_1, marker='.', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Real')
         axs[0, 0].legend()
 
-        axs[0, 1].plot(freq, real_1_2, marker='o', label='Posición (1,2)')
+        axs[0, 1].plot(freq, real_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Real')
         axs[0, 1].legend()
 
-        axs[1, 0].plot(freq, real_2_1, marker='o', label='Posición (2,1)')
+        axs[1, 0].plot(freq, real_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Real')
         axs[1, 0].legend()
 
-        axs[1, 1].plot(freq, real_2_2, marker='o', label='Posición (2,2)')
+        axs[1, 1].plot(freq, real_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Real')
@@ -383,25 +383,25 @@ def plot_img(matriz_seleccionada, freq):
         fig.suptitle('Imaginario vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, img_1_1, marker='o', label='Posición (1,1)')
+        axs[0, 0].plot(freq, img_1_1, marker='.', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Imaginario')
         axs[0, 0].legend()
 
-        axs[0, 1].plot(freq, img_1_2, marker='o', label='Posición (1,2)')
+        axs[0, 1].plot(freq, img_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Imaginario')
         axs[0, 1].legend()
 
-        axs[1, 0].plot(freq, img_2_1, marker='o', label='Posición (2,1)')
+        axs[1, 0].plot(freq, img_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Imaginario')
         axs[1, 0].legend()
 
-        axs[1, 1].plot(freq, img_2_2, marker='o', label='Posición (2,2)')
+        axs[1, 1].plot(freq, img_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Imaginario')
@@ -430,19 +430,19 @@ def plot_polar(matriz_seleccionada, freq):
     fig.suptitle('Fases en Coordenadas Polares para cada Posición', fontsize=16)
 
     # Graficar cada posición en su propio subgráfico
-    axs[0, 0].plot(fases_1_1, freq, marker='o', label='Posición (1,1)')
+    axs[0, 0].plot(fases_1_1, freq, marker='.', label='Posición (1,1)')
     axs[0, 0].set_title('Posición (1,1)', va='bottom')
     axs[0, 0].legend(loc='upper right')
 
-    axs[0, 1].plot(fases_1_2, freq, marker='o', label='Posición (1,2)')
+    axs[0, 1].plot(fases_1_2, freq, marker='.', label='Posición (1,2)')
     axs[0, 1].set_title('Posición (1,2)', va='bottom')
     axs[0, 1].legend(loc='upper right')
 
-    axs[1, 0].plot(fases_2_1, freq, marker='o', label='Posición (2,1)')
+    axs[1, 0].plot(fases_2_1, freq, marker='.', label='Posición (2,1)')
     axs[1, 0].set_title('Posición (2,1)', va='bottom')
     axs[1, 0].legend(loc='upper right')
 
-    axs[1, 1].plot(fases_2_2, freq, marker='o', label='Posición (2,2)')
+    axs[1, 1].plot(fases_2_2, freq, marker='.', label='Posición (2,2)')
     axs[1, 1].set_title('Posición (2,2)', va='bottom')
     axs[1, 1].legend(loc='upper right')
 

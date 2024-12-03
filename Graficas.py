@@ -603,59 +603,65 @@ def graficar():
 
 
 # Lista de frecuencias
-frecuencias = [1e6, 5e6, 10e6, 50e6, 100e6]  # Frecuencias en Hz
+#frecuencias = [1e6, 5e6, 10e6, 50e6, 100e6]  # Frecuencias en Hz
 
 # Diccionario de matrices dependientes de frecuencia
-matrices = {
-    "Z": [np.array([[1 + 1j * f, 2 + 0.5j * f], [3 - 0.5j * f, 4 + 1j * f]]) for f in frecuencias],
-    "Y": [np.array([[0.5 - 0.2j * f, 1.5 + 0.3j * f], [-0.5 + 0.7j * f, 0.7 - 0.4j * f]]) for f in frecuencias],
-    "ABCD": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
-    "S": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
-}
+#matrices = {
+#    "Z": [np.array([[1 + 1j * f, 2 + 0.5j * f], [3 - 0.5j * f, 4 + 1j * f]]) for f in frecuencias],
+#    "Y": [np.array([[0.5 - 0.2j * f, 1.5 + 0.3j * f], [-0.5 + 0.7j * f, 0.7 - 0.4j * f]]) for f in frecuencias],
+#    "ABCD": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
+#    "S": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
+#}
 
-#Archivo s2p
-filename = 'Line.s2p'
-s2p_freq, s2p_params, z_ref = read_s2p(filename)
+def Vizualizer(matrix, f): 
+    global s2p_params, s2p_freq, z_ref, combobox_matrices, sel_plot, boton_graficar, boton_mostrar, ventana_4, freq, matrices, frecuencias
 
-#Agregar archivo s2p al diccionario de matrices
-matrices['Archivo S2P'] = s2p_params
+    matrices = matrix
+    freq = f
+    frecuencias = f
+    #Archivo s2p
+    filename = 'Line.s2p'
+    s2p_freq, s2p_params, z_ref = read_s2p(filename)
 
-# Configuración de customtkinter
-ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
-ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
+    #Agregar archivo s2p al diccionario de matrices
+    #matrices['Archivo S2P'] = s2p_params
 
-# Crear la ventana principal
-ventana_4 = ctk.CTk()
-ventana_4.title("Resultados")
-ventana_4.geometry("400x300")
+    # Configuración de customtkinter
+    ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
+    ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
 
-# Etiqueta informativa
-etiqueta = ctk.CTkLabel(ventana_4, text="Selecciona una matriz y la acción que desea realizar. Si desea graficar, seleccione también el tipo de gráfica")
-etiqueta.pack(pady=10)
+    # Crear la ventana principal
+    ventana_4 = ctk.CTk()
+    ventana_4.title("Resultados")
+    ventana_4.geometry("400x300")
 
-# Combobox para seleccionar la matriz
-combobox_matrices = ctk.CTkComboBox(ventana_4, values=list(matrices.keys()))
-combobox_matrices.set(list(matrices.keys())[0])  # Seleccionar la primera opción por defecto
-combobox_matrices.pack(pady=10)
+    # Etiqueta informativa
+    etiqueta = ctk.CTkLabel(ventana_4, text="Selecciona una matriz y la acción que desea realizar. Si desea graficar, seleccione también el tipo de gráfica")
+    etiqueta.pack(pady=10)
 
-# Crear un combobox (selector) para elegir el tipo de gráfica
-sel_plot = ctk.CTkComboBox(
-    ventana_4,
-    values=["Magnitud vs Frecuencia", "Fase vs Frecuencia", 
-            "dB vs Frecuencia", "Real vs Frecuencia", 
-            "Imaginario vs Frecuencia", "Gráfica Polar", "Carta de Smith"]
-)
-sel_plot.set("Magnitud vs Frecuencia")  # Valor predeterminado
-sel_plot.pack(pady=10)
+    # Combobox para seleccionar la matriz
+    combobox_matrices = ctk.CTkComboBox(ventana_4, values=list(matrices.keys()))
+    combobox_matrices.set(list(matrices.keys())[0])  # Seleccionar la primera opción por defecto
+    combobox_matrices.pack(pady=10)
 
-# Botón para graficar
-boton_graficar = ctk.CTkButton(ventana_4, text="Graficar", command=graficar)
-boton_graficar.pack(pady=20)
+    # Crear un combobox (selector) para elegir el tipo de gráfica
+    sel_plot = ctk.CTkComboBox(
+        ventana_4,
+        values=["Magnitud vs Frecuencia", "Fase vs Frecuencia", 
+                "dB vs Frecuencia", "Real vs Frecuencia", 
+                "Imaginario vs Frecuencia", "Gráfica Polar", "Carta de Smith"]
+    )
+    sel_plot.set("Magnitud vs Frecuencia")  # Valor predeterminado
+    sel_plot.pack(pady=10)
 
-# Botón para mostrar la matriz seleccionada
-boton_mostrar = ctk.CTkButton(ventana_4, text="Mostrar Matriz", command=mostrar)
-boton_mostrar.pack(pady=20)
+    # Botón para graficar
+    boton_graficar = ctk.CTkButton(ventana_4, text="Graficar", command=graficar)
+    boton_graficar.pack(pady=20)
 
-# Iniciar la GUI
-ventana_4.mainloop()
+    # Botón para mostrar la matriz seleccionada
+    boton_mostrar = ctk.CTkButton(ventana_4, text="Mostrar Matriz", command=mostrar)
+    boton_mostrar.pack(pady=20)
+
+    # Iniciar la GUI
+    ventana_4.mainloop()
 

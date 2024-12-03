@@ -25,7 +25,7 @@ class Circuit:
 
         for component in self._components:
             type_, value, *nodes = component
-            if type_ == "R":
+            if type_ in ["R", "Z"]:
                 self._components_values.append(value)
             elif type_ == "C":
                 self._components_values.append(-1j / (2 * np.pi * self._frecuency * value))
@@ -257,26 +257,31 @@ class Circuit:
 
     def run_simulation(self):
         """Run the circuit simulation."""
-        circuit = {}
+        frequencies = []
+        matrix = {}
+        matrix["Y"] = []
+        matrix["Z"] = []
+        matrix["ABCD"] = []
+        matrix["S"] = []
         while self._frecuency <= self._upper_freq_limit:
 
-            matrix = {}
+            frequencies.append(self._frecuency)
             self.impedance_calculator()
             self.equivalent_circuit()
             self.components_to_node()
             self.get_circuit_matrix()
             self.get_y_matrix()
-            matrix["Y"] = self.y_matrix
+            matrix["Y"].append(self.y_matrix)
             self.y2z()
-            matrix["Z"] = self.z_matrix
+            matrix["Z"].append(self.z_matrix)
             self.z2abcd()
-            matrix["ABCD"] = self.abcd_matrix
+            matrix["ABCD"].append(self.abcd_matrix)
             self.z2s()
-            matrix["S"] = self.s_matrix
-            circuit[self._frecuency] = matrix
+            matrix["S"].append(self.s_matrix)
+
             self._frecuency += self._freq_step
 
-        return circuit
+        return matrix, frequencies
     
 if __name__ == "__main__":
     

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from circuit_class import Circuit
+from Graficas import Vizualizer
 
 
 # Función para validar si una entrada es un número flotante
@@ -90,12 +91,12 @@ def save_comp_inf():
                           z_charac = float(i_impedance)
                           )
         try:
-            sim_circuit = circuit.run_simulation()
+            matrix, frequencies = circuit.run_simulation()
         except Exception as e:
             messagebox.showerror("ERROR", f"Ocurrió un error al simular el circuito: {e}")
         else:
             messagebox.showinfo("INFO", f"Se ha simulado el circuito correctamente")
-            print(sim_circuit)
+            Vizualizer(matrix, frequencies)
     else:
         messagebox.showwarning("Advertencia", "No se ha ingresado suficiente información.")
 

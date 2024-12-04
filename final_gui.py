@@ -53,7 +53,7 @@ def load_s2p_file():
         messagebox.showerror("Error", "No se seleccionó ningún archivo.")
                            
     # Botón para enviar la información general
-    submit_gnl_inf_button = ctk.CTkButton(frame, text="Enviar Información", command=submit_grl_info)
+    submit_gnl_inf_button = ctk.CTkButton(frame, text="Enviar", command=submit_grl_info)
     submit_gnl_inf_button.grid(row=7, column=0, columnspan=2, pady=10)
 
 #Función para leer un archivo s2p
@@ -106,7 +106,7 @@ def read_s2p(filename):
                         raise ValueError("El formato de los datos de parámetros S no es válido.")
                     
                     #Matriz S para determinada frecuencia
-                    matriz_s = np.array([[s11, s12], [s21, s22]], dtype=complex)
+                    matriz_s = np.array([s11, s12, s21, s22], dtype=complex)
                     
                     #Guardar la frecuencia y la matriz
                     frequencies.append(freq)
@@ -133,7 +133,7 @@ def es_numero(valor):
 
 # Función guarda la información general del circuito
 def submit_grl_info():
-    global box_list, i_freq, f_freq, s_freq, i_impedance, comp, input_nodes_list, s2p_freq, s2p_steps, s2p_params, s2p_z_ref, s2p_freq_type, s2p_param_type, s2p_result_type
+    global box_list, i_freq, f_freq, s_freq, i_impedance, comp, input_nodes_list, s2p_freq, s2p_steps, s2p_params, s2p_z_ref, s2p_freq_type, s2p_param_type, s2p_result_type, nodos_s2p_lista 
         
 
     comp = int(component_number_entry.get())      # guarda número de los componentes
@@ -145,6 +145,8 @@ def submit_grl_info():
         f_freq = final_freq_entry.get()          # guarda la frecuencia final
         s_freq = steps_freq_entry.get()          # guarda los pasos que se darán
         i_impedance = charac_imp_entry.get()     # guarda el valor de la impedancia característica
+        s2p_params = None
+        nodos_s2p_lista = None
     elif toggle_sel == 1:
         s2p_freq, s2p_steps, s2p_params, s2p_z_ref, s2p_freq_type, s2p_param_type, s2p_result_type = read_s2p(archivo_s2p)
         i_freq = s2p_freq[0]
@@ -153,7 +155,7 @@ def submit_grl_info():
         i_impedance = s2p_z_ref
         nodos = nodos_entry.get()
         nodos_s2p_lista = nodos.split()
-        if len(nodos_s2p_lista) == 3 and all(i.isdigit() for i in nodos_s2p_lista):
+        if (len(nodos_s2p_lista) == 2 or len(nodos_s2p_lista) == 3) and all(i.isdigit() for i in nodos_s2p_lista):
             messagebox.showinfo("Información", f"Archivo S2P: {archivo_s2p}\nNodos: {nodos_s2p_lista}")
         else:
             messagebox.showerror("Error", "Por favor, ingresa tres nodos numéricos válidos separados por espacio.")
@@ -177,7 +179,7 @@ def submit_grl_info():
             messagebox.showwarning("ERROR", "Las entradas deben ser números enteros")
             return
     elif toggle_sel == 1:
-        if not all([comp, input_nodes]):
+        if not all([input_nodes]):
             messagebox.showwarning("ERROR", "Campos incompletos!")
             print(input_nodes)
             return
@@ -186,18 +188,6 @@ def submit_grl_info():
             return
     else:
         messagebox.showerror("ERROR", "Algo salió mal")   
-    
-    # Cerrar la ventana principal
-    #ventana.withdraw()
-    
-    # Nueva ventana para registro de componentes
-    #ventana_2 = ctk.CTk()
-    #ventana_2.title("Registro de Componentes y Lectura de Archivos")
-    #ventana_2.geometry("600x400")
-    
-    # Crear el frame para registro de componentes
-    #component_reg_frame = ctk.CTkFrame(ventana_2)
-    #component_reg_frame.pack(padx=20, pady=20, fill="both", expand=True)  # Usar pack en el marco principal
 
     # Encabezado del frame
     header_label = ctk.CTkLabel(frame, text="REGISTRO DE COMPONENTES", font=("Arial", 14, "bold"))
@@ -212,13 +202,10 @@ def submit_grl_info():
         box.grid(row=i + 11, column=1, padx=5, pady=5)
         box_list.append(box)
 
-    # Botón para guardar la información de los componentes
     submit_comp_inf_button = ctk.CTkButton(frame, text="Simular", command=save_comp_inf)
     submit_comp_inf_button.grid(row=10, column=2, padx=10, pady=10)
     submit_comp_inf_button.configure(width=10, height=1)
 
-    # Ejecutar la interfaz gráfica de la nueva ventana
-    #ventana_2.mainloop()
 
 # Función para guardar la información de los componentes
 def save_comp_inf():
@@ -241,7 +228,7 @@ def save_comp_inf():
             messagebox.showerror("ERROR", "Describir el tipo de componente (R, L, C, S, O, T)")
 
     # Mostrar la información guardada
-    if components_info:
+    if components_info or toggle_sel:
         messagebox.showinfo("INFO", f"Se han guardado los siguientes componentes:\n{components_info}")
 
         circuit = Circuit(components=components_info,
@@ -249,7 +236,9 @@ def save_comp_inf():
                           lower_freq_limit=float(i_freq),
                           upper_freq_limit=float(f_freq),
                           freq_step=float(s_freq),
-                          z_charac=float(i_impedance)
+                          z_charac=float(i_impedance),
+                          s2p_device = s2p_params,
+                          s2p_nodes = nodos_s2p_lista,
                           )
         try:
             matrix, frequencies = circuit.run_simulation()

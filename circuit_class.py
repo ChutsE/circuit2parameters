@@ -2,13 +2,15 @@ import numpy as np
 
 class Circuit:
     
-    def __init__(self, components: list, input_nodes: list, lower_freq_limit: float, upper_freq_limit: float, freq_step: float, z_charac: float):
+    def __init__(self, components: list, input_nodes: list, lower_freq_limit: float, upper_freq_limit: float, freq_step: float, z_charac: float, s2p_device: list = None, s2p_nodes: list = None):
         self._components = components
         self._input_nodes = input_nodes
         self._frecuency = lower_freq_limit
         self._upper_freq_limit = upper_freq_limit
         self._freq_step = freq_step
         self._z_charac = z_charac
+        self._s2p_device = s2p_device
+        self._s2p_nodes = s2p_nodes
         self._components_values = []
         self._components_nodes = []
         self._nodes_matrix = []
@@ -19,13 +21,26 @@ class Circuit:
         self.y_matrix = None
         self.abcd_matrix = None
         self.s_matrix = None
+        self.__s2p_cnt = 0
+        
+    def s2p_to_components(self):
 
-    def ABCD_2Port(param):
-        
-        if len(param) != 4:
-            raise ValueError("Error")
-        
-        A, B, C, D = param
+        Za, Zb, Zc = self.__ABCD_2Port(self.__S2ABCD(self._s2p_device[self.__s2p_cnt]))
+
+        if len(self._s2p_nodes) == 3:
+            self._components.append(["Z", Za, int(self._s2p_nodes[2]), int(self._s2p_nodes[0])])
+            self._components.append(["Z", Zb, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zc, int(self._s2p_nodes[1]), int(self._s2p_nodes[2])])
+        elif len(self._s2p_nodes) == 2:
+            self._components.append(["Z", Za, int(self._s2p_nodes[0])])
+            self._components.append(["Z", Zb, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zc, int(self._s2p_nodes[1])])
+        self.__s2p_cnt += 1
+
+
+    def __ABCD_2Port(self, param):
+
+        [A, B, C, D] = param
         
         Yc = complex(1 / B)
         Ya = complex((D/B) - 1)
@@ -36,23 +51,18 @@ class Circuit:
         Zc = 1/Yc
         return Za, Zb, Zc
     
-    def s2ABCD(param, z_ref):
-        
-        if len(param) != 4:
-            raise ValueError("Error")
-        
-        
-        s11, s12, s21, s22 = param
+    def __S2ABCD(self, param):
+
+        [s11, s12, s21, s22] = param
         
         abcd_mat = [0]*4
         
         denom = 2 * s21
             
         abcd_mat[0] = complex(((1+s11) * (1-s22) + (s12*s21)) / (denom))
-        abcd_mat[1] = complex(z_ref * ((1+s11) * (1+s22) - (s12*s21)) / (denom))
-        abcd_mat[2] = complex((1/z_ref) * ((1+s11) * (1+s22) - (s12*s21)) / (denom)) 
+        abcd_mat[1] = complex(self._z_charac * ((1+s11) * (1+s22) - (s12*s21)) / (denom))
+        abcd_mat[2] = complex((1/self._z_charac) * ((1+s11) * (1+s22) - (s12*s21)) / (denom)) 
         abcd_mat[3] = complex(((1-s11) * (1+s22) + (s12*s21)) / (denom))
-        
         
         return abcd_mat
     
@@ -302,6 +312,8 @@ class Circuit:
         while self._frecuency <= self._upper_freq_limit:
 
             frequencies.append(self._frecuency)
+            if self._s2p_device:
+                self.s2p_to_components()
             self.impedance_calculator()
             self.equivalent_circuit()
             self.components_to_node()
@@ -316,7 +328,7 @@ class Circuit:
             matrix["S"].append(self.s_matrix)
 
             self._frecuency += self._freq_step
-
+        self.__s2p_cnt =0
         return matrix, frequencies
     
 if __name__ == "__main__":

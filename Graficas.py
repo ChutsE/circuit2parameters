@@ -198,24 +198,28 @@ def plot_mag(matriz_seleccionada, freq):
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Magnitud')
         axs[0, 0].legend()
+        axs[0, 0].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
 
         axs[0, 1].plot(freq, mag_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Magnitud')
         axs[0, 1].legend()
+        axs[0, 1].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
 
         axs[1, 0].plot(freq, mag_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Magnitud')
         axs[1, 0].legend()
+        axs[1, 0].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
 
         axs[1, 1].plot(freq, mag_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Magnitud')
         axs[1, 1].legend()
+        axs[1, 1].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -245,24 +249,28 @@ def plot_Phase(matriz_seleccionada, freq):
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Fase')
         axs[0, 0].legend()
+        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[0, 1].plot(freq, Phase_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Fase')
         axs[0, 1].legend()
+        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 0].plot(freq, Phase_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Fase')
         axs[1, 0].legend()
+        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 1].plot(freq, Phase_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Fase')
         axs[1, 1].legend()
+        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -292,24 +300,28 @@ def plot_dB(matriz_seleccionada, freq):
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Fase')
         axs[0, 0].legend()
+        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[0, 1].plot(freq, dB_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Fase')
         axs[0, 1].legend()
+        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 0].plot(freq, dB_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Fase')
         axs[1, 0].legend()
+        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 1].plot(freq, dB_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Fase')
         axs[1, 1].legend()
+        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -340,24 +352,28 @@ def plot_real(matriz_seleccionada, freq):
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Real')
         axs[0, 0].legend()
+        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[0, 1].plot(freq, real_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Real')
         axs[0, 1].legend()
+        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 0].plot(freq, real_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Real')
         axs[1, 0].legend()
+        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 1].plot(freq, real_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Real')
         axs[1, 1].legend()
+        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -388,24 +404,28 @@ def plot_img(matriz_seleccionada, freq):
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Imaginario')
         axs[0, 0].legend()
+        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[0, 1].plot(freq, img_1_2, marker='.', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Imaginario')
         axs[0, 1].legend()
+        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 0].plot(freq, img_2_1, marker='.', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Imaginario')
         axs[1, 0].legend()
+        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
         axs[1, 1].plot(freq, img_2_2, marker='.', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Imaginario')
         axs[1, 1].legend()
+        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])

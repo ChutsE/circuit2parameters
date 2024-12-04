@@ -20,6 +20,42 @@ class Circuit:
         self.abcd_matrix = None
         self.s_matrix = None
 
+    def ABCD_2Port(param):
+        
+        if len(param) != 4:
+            raise ValueError("Error")
+        
+        A, B, C, D = param
+        
+        Yc = complex(1 / B)
+        Ya = complex((D/B) - 1)
+        Yb = complex((A/B) - 1)
+        
+        Za = 1/Ya
+        Zb = 1/Yb
+        Zc = 1/Yc
+        return Za, Zb, Zc
+    
+    def s2ABCD(param, z_ref):
+        
+        if len(param) != 4:
+            raise ValueError("Error")
+        
+        
+        s11, s12, s21, s22 = param
+        
+        abcd_mat = [0]*4
+        
+        denom = 2 * s21
+            
+        abcd_mat[0] = complex(((1+s11) * (1-s22) + (s12*s21)) / (denom))
+        abcd_mat[1] = complex(z_ref * ((1+s11) * (1+s22) - (s12*s21)) / (denom))
+        abcd_mat[2] = complex((1/z_ref) * ((1+s11) * (1+s22) - (s12*s21)) / (denom)) 
+        abcd_mat[3] = complex(((1-s11) * (1+s22) + (s12*s21)) / (denom))
+        
+        
+        return abcd_mat
+    
     def impedance_calculator(self):
         """Convert input components to components_values and components_nodes."""
 

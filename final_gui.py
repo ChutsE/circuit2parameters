@@ -5,26 +5,24 @@ import customtkinter as ctk
 import skrf as rf
 from tkinter import filedialog, messagebox  # Importamos messagebox desde tkinter
 import numpy as np
+import sys
+import os
 from Graficas import Vizualizer
 
 #Función que selecciona entre cargar o no cargar el archivo s2p
 def toggle_options():
-    global toggle_sel
-    
-    """Controla la visibilidad de los botones según los checkboxes activos."""
-    if s2p_file_chckbx_si.get():
-        s2p_file_chckbx_no.set(False)
-        hide_info()   
-        load_s2p_file()
+    global nodos_label, nodos_entry, toggle_sel
+    if s2p_file_chckbx.get():
         toggle_sel = 1
-    elif s2p_file_chckbx_no.get():
-        s2p_file_chckbx_si.set(False)  # Desactiva el otro checkbox
-        hide_s2p()
-        show_grl_info()
-        toggle_sel = 0
+        hide_info()
+        nodos_label = ctk.CTkLabel(frame, text="Ingresa los nodos del s2p:")
+        nodos_entry = ctk.CTkEntry(frame)
+        nodos_label.grid(row=5, column=0, padx=10, pady=10)
+        nodos_entry.grid(row=5, column=1, padx=10, pady=10)
+        load_s2p_file()
     else:
-        hide_info()     
-        hide_s2p()
+        toggle_sel = 0
+
     #Ajustar tamaño automáticamente después de cambiar el contenido
     ventana.update_idletasks()
 
@@ -39,27 +37,7 @@ def hide_info():
     steps_freq_entry.grid_remove()
     charac_imp_label.grid_remove()
     charac_imp_entry.grid_remove()
-
-#Funcion para ocultar datos de archivo s2p
-def hide_s2p():
-    nodos_entry.grid_remove()
-    nodos_label.grid_remove()
-    
-#Función para mostrar los datos de inf general    
-def show_grl_info():
-    init_freq_label.grid(row=3, column=0, sticky="w", pady=5)
-    final_freq_label.grid(row=4, column=0, sticky="w", pady=5)
-    steps_freq_label.grid(row=5, column=0, sticky="w", pady=5)
-    charac_imp_label.grid(row=6, column=0, sticky="w", pady=5)
-    component_number_entry.grid(row=1, column=1, padx=10, pady=5)
-    input_nodes_entry.grid(row=2, column=1, padx=10, pady=5)
-    init_freq_entry.grid(row=3, column=1, padx=10, pady=5)
-    final_freq_entry.grid(row=4, column=1, padx=10, pady=5)
-    steps_freq_entry.grid(row=5, column=1, padx=10, pady=5)
-    charac_imp_entry.grid(row=6, column=1, padx=10, pady=5)
-    # Botón para enviar la información general
-    submit_gnl_inf_button = ctk.CTkButton(frame, text="Enviar Información", command=submit_grl_info)
-    submit_gnl_inf_button.grid(row=7, column=0, columnspan=2, pady=10)
+    submit_gnl_inf_button.grid_remove()
 
 #Función para cargar archivo s2p
 def load_s2p_file():
@@ -73,23 +51,7 @@ def load_s2p_file():
         messagebox.showinfo("Archivo Cargado", f"El archivo {archivo_s2p} se ha cargado correctamente.")
     else:
         messagebox.showerror("Error", "No se seleccionó ningún archivo.")
-            
-    if archivo_s2p:
-        # Crear una entrada para ingresar los nodos entre los que está el archivo
-        nodos_label.grid(row=0 + 3, column=0, columnspan=2, pady=10)
-        nodos_entry.grid(row=1 + 4, column=0, columnspan=2, pady=10)
-            
-        # Función para procesar los nodos ingresados
-        global nodos_lista
-        nodos = nodos_entry.get()
-        nodos_lista = nodos.split()
-        if len(nodos_lista) == 3 and all(i.isdigit() for i in nodos_lista):
-            messagebox.showinfo("Información", f"Archivo S2P: {archivo_s2p}\nNodos: {nodos_lista}")
-        else:
-            messagebox.showerror("Error", "Por favor, ingresa tres nodos numéricos válidos separados por espacio.")
-    
-    component_number_entry.grid(row=1, column=1, padx=10, pady=5)
-    input_nodes_entry.grid(row=2, column=1, padx=10, pady=5)                
+                           
     # Botón para enviar la información general
     submit_gnl_inf_button = ctk.CTkButton(frame, text="Enviar Información", command=submit_grl_info)
     submit_gnl_inf_button.grid(row=7, column=0, columnspan=2, pady=10)
@@ -162,44 +124,6 @@ def read_s2p(filename):
     except Exception as e:
         raise RuntimeError(f"Ocurrió un error al procesar el archivo: {e}")
 
-#Función para convertir parámetros S a ABCD
-def s2ABCD(param, z_ref):
-    
-    if len(param) != 4:
-        raise ValueError("Error")
-    
-    
-    s11, s12, s21, s22 = param
-    
-    abcd_mat = [0]*4
-    
-    denom = 2 * s21
-        
-    abcd_mat[0] = complex(((1+s11) * (1-s22) + (s12*s21)) / (denom))
-    abcd_mat[1] = complex(z_ref * ((1+s11) * (1+s22) - (s12*s21)) / (denom))
-    abcd_mat[2] = complex((1/z_ref) * ((1+s11) * (1+s22) - (s12*s21)) / (denom)) 
-    abcd_mat[3] = complex(((1-s11) * (1+s22) + (s12*s21)) / (denom))
-    
-    
-    return abcd_mat
-
-#Función para convertir parámetros ABCD a red de dos puertos    
-def ABCD_2Port(param):
-    
-    if len(param) != 4:
-        raise ValueError("Error")
-    
-    A, B, C, D = param
-    
-    Yc = complex(1 / B)
-    Ya = complex((D/B) - 1)
-    Yb = complex((A/B) - 1)
-    
-    Za = 1/Ya
-    Zb = 1/Yb
-    Zc = 1/Yc
-    return Za, Zb, Zc
-# Función para validar si una entrada es un número flotante
 def es_numero(valor):
     try:
         float(valor)
@@ -209,11 +133,10 @@ def es_numero(valor):
 
 # Función guarda la información general del circuito
 def submit_grl_info():
-    global box_list, i_freq, f_freq, s_freq, i_impedance, comp, input_nodes_list, ventana_2, s2p_freq, s2p_steps, s2p_params, s2p_z_ref, s2p_freq_type, s2p_param_type, s2p_result_type
+    global box_list, i_freq, f_freq, s_freq, i_impedance, comp, input_nodes_list, s2p_freq, s2p_steps, s2p_params, s2p_z_ref, s2p_freq_type, s2p_param_type, s2p_result_type
         
-    
 
-    comp = nmb_comp.get()                    # guarda número de los componentes
+    comp = int(component_number_entry.get())      # guarda número de los componentes
     input_nodes = input_nodes_entry.get()    # guarda los nodos de entrada
     input_nodes_list = input_nodes.strip().split()  
     
@@ -222,13 +145,18 @@ def submit_grl_info():
         f_freq = final_freq_entry.get()          # guarda la frecuencia final
         s_freq = steps_freq_entry.get()          # guarda los pasos que se darán
         i_impedance = charac_imp_entry.get()     # guarda el valor de la impedancia característica
-        print(comp)
     elif toggle_sel == 1:
         s2p_freq, s2p_steps, s2p_params, s2p_z_ref, s2p_freq_type, s2p_param_type, s2p_result_type = read_s2p(archivo_s2p)
         i_freq = s2p_freq[0]
         f_freq = s2p_freq[-1]
         s_freq = s2p_steps
         i_impedance = s2p_z_ref
+        nodos = nodos_entry.get()
+        nodos_s2p_lista = nodos.split()
+        if len(nodos_s2p_lista) == 3 and all(i.isdigit() for i in nodos_s2p_lista):
+            messagebox.showinfo("Información", f"Archivo S2P: {archivo_s2p}\nNodos: {nodos_s2p_lista}")
+        else:
+            messagebox.showerror("Error", "Por favor, ingresa tres nodos numéricos válidos separados por espacio.")
     else:
         messagebox.showerror("ERROR", "Algo salió mal")
         
@@ -260,36 +188,37 @@ def submit_grl_info():
         messagebox.showerror("ERROR", "Algo salió mal")   
     
     # Cerrar la ventana principal
-    ventana.withdraw()
-
+    #ventana.withdraw()
+    
     # Nueva ventana para registro de componentes
-    ventana_2 = ctk.CTk()
-    ventana_2.title("Registro de Componentes y Lectura de Archivos")
-    ventana_2.geometry("600x400")
+    #ventana_2 = ctk.CTk()
+    #ventana_2.title("Registro de Componentes y Lectura de Archivos")
+    #ventana_2.geometry("600x400")
     
     # Crear el frame para registro de componentes
-    component_reg_frame = ctk.CTkFrame(ventana_2)
-    component_reg_frame.pack(padx=20, pady=20, fill="both", expand=True)  # Usar pack en el marco principal
+    #component_reg_frame = ctk.CTkFrame(ventana_2)
+    #component_reg_frame.pack(padx=20, pady=20, fill="both", expand=True)  # Usar pack en el marco principal
 
     # Encabezado del frame
-    header_label = ctk.CTkLabel(component_reg_frame, text="Registro de Componentes", font=("Arial", 14, "bold"))
-    header_label.grid(row=0, column=0, columnspan=2, pady=10)
+    header_label = ctk.CTkLabel(frame, text="REGISTRO DE COMPONENTES", font=("Arial", 14, "bold"))
+    header_label.grid(row=10, column=0, columnspan=12, pady=10)
 
     # Crear las etiquetas y cajas de texto de acuerdo al número de componentes registrados
     box_list = []  # Limpiar la lista de cajas antes de agregar nuevas
     for i in range(comp):
-        label = ctk.CTkLabel(component_reg_frame, text=f"Componente {i+1}:")
-        label.grid(row=i + 1, column=0, sticky="w", padx=5, pady=5)
-        box = ctk.CTkEntry(component_reg_frame)
-        box.grid(row=i + 1, column=1, padx=5, pady=5)
+        label = ctk.CTkLabel(frame, text=f"Componente {i+1}:")
+        label.grid(row=i + 11, column=0, sticky="w", padx=5, pady=5)
+        box = ctk.CTkEntry(frame)
+        box.grid(row=i + 11, column=1, padx=5, pady=5)
         box_list.append(box)
 
     # Botón para guardar la información de los componentes
-    submit_comp_inf_button = ctk.CTkButton(component_reg_frame, text="Guardar Información", command=save_comp_inf)
-    submit_comp_inf_button.grid(row=comp + 1, column=0, columnspan=2, pady=10)
+    submit_comp_inf_button = ctk.CTkButton(frame, text="Simular", command=save_comp_inf)
+    submit_comp_inf_button.grid(row=10, column=2, padx=10, pady=10)
+    submit_comp_inf_button.configure(width=10, height=1)
 
     # Ejecutar la interfaz gráfica de la nueva ventana
-    ventana_2.mainloop()
+    #ventana_2.mainloop()
 
 # Función para guardar la información de los componentes
 def save_comp_inf():
@@ -331,6 +260,11 @@ def save_comp_inf():
             Vizualizer(matrix, frequencies)
     else:
         messagebox.showwarning("Advertencia", "No se ha ingresado suficiente información.")
+        return
+    
+def reset_script():
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
 # Configuración de estilo de CustomTkinter
 ctk.set_appearance_mode("System")  # Modo de apariencia: "Light", "Dark", "System"
@@ -339,7 +273,7 @@ ctk.set_default_color_theme("blue")  # Tema de color: "blue", "dark-blue", "gree
 # Principal Window
 ventana = ctk.CTk()
 ventana.title("Simulador de Circuitos - Ing Microondas I")
-ventana.geometry("800x400")
+ventana.geometry("470x550")
 ventana.resizable(True, True)  # Habilitar redimensionamiento
 
 # Crear el marco principal
@@ -350,48 +284,52 @@ frame.pack(padx=20, pady=20, fill="both", expand=True)  # Usar pack en el marco 
 general_info_label = ctk.CTkLabel(frame, text="INFORMACIÓN GENERAL DEL CIRCUITO", font=("Arial", 14, "bold"))
 general_info_label.grid(row=0, column=0, columnspan=2, pady=10)
 
-# Etiquetas de información general
-component_number_label = ctk.CTkLabel(frame, text="Número de componentes")
-component_number_label.grid(row=1, column=0, sticky="w", pady=5)
-nmb_comp = ctk.IntVar()
-component_number_entry = ctk.CTkEntry(frame, textvariable=nmb_comp)
-component_number_entry.grid(row=1, column=1, padx=10, pady=5)
-s2p_file_chckbx_si = ctk.BooleanVar()
-s2p_file_chckbx_no = ctk.BooleanVar()
-
-input_nodes_label = ctk.CTkLabel(frame, text="Puertos de entrada")
-input_nodes_label.grid(row=2, column=0, sticky="w", pady=5)
-input_nodes_entry = ctk.CTkEntry(frame)
-input_nodes_entry.grid(row=2, column=1, padx=10, pady=5)
-
-s2p_file_label = ctk.CTkLabel(frame, text="¿Desea cargar archivo s2p?")
-s2p_file_label.grid(row=1, column=3, sticky="w", pady=5)
-
 # Crear el checkbox
-chckbx_si = ctk.CTkCheckBox(frame, text="Sí", variable=s2p_file_chckbx_si, command=toggle_options)
-chckbx_si.grid(row=1, column=4, sticky="w", pady=5)
-chckbx_no = ctk.CTkCheckBox(frame, text="No", variable=s2p_file_chckbx_no, command=toggle_options)
-chckbx_no.grid(row=1, column=5, sticky="w", pady=5)
+s2p_file_chckbx = ctk.BooleanVar()
+chckbx_si = ctk.CTkCheckBox(frame, text="¿Desea cargar .s2p?", variable=s2p_file_chckbx, command=toggle_options)
+chckbx_si.grid(row=1, column=1, sticky="w", pady=5)
+toggle_sel = 0
 
-#Crea las entradas solo se muestran si el usuario decide no usar un archivo s2p
-init_freq_label = ctk.CTkLabel(frame, text="Frecuencia inicial (Hz)")
+component_number_label = ctk.CTkLabel(frame, text="  Número de componentes")
+component_number_entry = ctk.CTkEntry(frame)
+
+input_nodes_label = ctk.CTkLabel(frame, text="  Nodos donde se asignan\n los puertos")
+input_nodes_entry = ctk.CTkEntry(frame)
+
+init_freq_label = ctk.CTkLabel(frame, text="  Frecuencia inicial (Hz)")
 init_freq_entry = ctk.CTkEntry(frame)
-final_freq_label = ctk.CTkLabel(frame, text="Frecuencia final (Hz)")
+
+final_freq_label = ctk.CTkLabel(frame, text="  Frecuencia final (Hz)")
 final_freq_entry = ctk.CTkEntry(frame)
-steps_freq_label = ctk.CTkLabel(frame, text="Pasos de frecuencia (Hz)")
+
+steps_freq_label = ctk.CTkLabel(frame, text="  Pasos de frecuencia (Hz)")
 steps_freq_entry = ctk.CTkEntry(frame)
-charac_imp_label = ctk.CTkLabel(frame, text="Valor impedancia característica (Ω)")
+
+charac_imp_label = ctk.CTkLabel(frame, text="  Impedancia característica (Ω)")
 charac_imp_entry = ctk.CTkEntry(frame)
 
-# Entradas para la información general
-nmb_comp = ctk.IntVar()
-component_number_entry = ctk.CTkEntry(frame, textvariable=nmb_comp)
-input_nodes_entry = ctk.CTkEntry(frame)
+component_number_label.grid(row=3, column=0, sticky="w", pady=5)
+component_number_entry.grid(row=3, column=1, padx=10, pady=5)
 
-#Crea las entradas usadas si el usuario decide usar archivo s2p
-nodos_label = ctk.CTkLabel(frame, text="Ingresa los nodos (3 nodos separados por espacio):")
-nodos_entry = ctk.CTkEntry(frame)
+input_nodes_label.grid(row=4, column=0, sticky="w", pady=5)
+input_nodes_entry.grid(row=4, column=1, padx=10, pady=5)
 
+init_freq_label.grid(row=5, column=0, sticky="w", pady=5)
+init_freq_entry.grid(row=5, column=1, padx=10, pady=5)
 
-# Ejecutar la interfaz gráfica
+final_freq_label.grid(row=6, column=0, sticky="w", pady=5)
+final_freq_entry.grid(row=6, column=1, padx=10, pady=5)
+
+steps_freq_label.grid(row=7, column=0, sticky="w", pady=5)
+steps_freq_entry.grid(row=7, column=1, padx=10, pady=5)
+
+charac_imp_label.grid(row=8, column=0, sticky="w", pady=5)
+charac_imp_entry.grid(row=8, column=1, padx=10, pady=5)
+
+submit_gnl_inf_button = ctk.CTkButton(frame, text="Enviar", command=submit_grl_info)
+submit_gnl_inf_button.grid(row=9, column=0, columnspan=2, pady=10)
+
+reset_button = tk.Button(frame, text="Reset", command=reset_script)
+reset_button.grid(row=0, column=2, padx=10, pady=10)
+
 ventana.mainloop()

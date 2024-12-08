@@ -11,12 +11,9 @@ class Circuit:
         self._z_charac = z_charac
         self._s2p_device = s2p_device
         self._s2p_nodes = s2p_nodes
-        self._components_values = []
-        self._components_nodes = []
         self._nodes_matrix = []
         self._circuit_matrix = None
         self._no_in_nodes = None
-        self._in_nodes = []
         self.z_matrix = None
         self.y_matrix = None
         self.abcd_matrix = None
@@ -68,7 +65,8 @@ class Circuit:
     
     def impedance_calculator(self):
         """Convert input components to components_values and components_nodes."""
-
+        self._components_nodes = []
+        self._components_values = []
         for component in self._components:
             type_, value, *nodes = component
             if type_ in ["R", "Z"]:
@@ -182,7 +180,8 @@ class Circuit:
         """Convert the components to nodes."""
 
         nodes = []
-        for node_num in range(len(self._components_nodes)+1):
+        print(self._components_nodes)
+        for node_num in range(len(self._components_nodes) + 1):
             node  = [component_num for component_num, component in enumerate(self._components_nodes) if node_num in component]
             if node_num in self._input_nodes:
                 node.append(f"In_{node_num}")
@@ -195,7 +194,8 @@ class Circuit:
         circuit_matrix_len = len(self._nodes_matrix)
         self._circuit_matrix = np.zeros((circuit_matrix_len, circuit_matrix_len), dtype=complex)
         
-        
+        print(self._nodes_matrix)
+        print(self._components_values)
         for j in range(circuit_matrix_len):
             for i in range(circuit_matrix_len):
                 if i == j:
@@ -232,11 +232,11 @@ class Circuit:
         return -1
 
     def get_y_matrix(self):
-        """Calculate the Z matrix for a circuit."""
+        """Calculate the Y matrix for a circuit."""
         
         total_nodes = set(range(len(self._circuit_matrix)))
         self._no_in_nodes = list(total_nodes - set(self._in_nodes)) 
-
+        
         while len(self._no_in_nodes) > 0:
             self.__matrix_reduction()
             self._no_in_nodes = [n - 1 for n in self._no_in_nodes[1:]]
@@ -288,6 +288,11 @@ class Circuit:
 
     def z2s(self):
         """Convert Z matrix to S matrix."""
+        
+        z0_unitary_matrix = self._z_charac * np.eye(len(self.z_matrix), dtype=complex)
+        self.s_matrix =  np.dot(np.linalg.inv(self.z_matrix + z0_unitary_matrix), self.z_matrix - z0_unitary_matrix)
+
+        """
         if len(self.z_matrix) == 2:
             s_11 = ((self.z_matrix[0][0] - self._z_charac) * (self.z_matrix[1][1] + self._z_charac) - 
                     (self.z_matrix[0][1] * self.z_matrix[1][0])) / ((self.z_matrix[0][0] + self._z_charac) * 
@@ -300,6 +305,7 @@ class Circuit:
                     (self.z_matrix[0][1] * self.z_matrix[1][0])) / ((self.z_matrix[0][0] + self._z_charac) * 
                     (self.z_matrix[1][1] + self._z_charac) - (self.z_matrix[0][1] * self.z_matrix[1][0]))
             self.s_matrix = np.array([[s_11, s_12], [s_21, s_22]], dtype=complex)
+        """
 
     def run_simulation(self):
         """Run the circuit simulation."""
@@ -328,7 +334,7 @@ class Circuit:
             matrix["S"].append(self.s_matrix)
 
             self._frecuency += self._freq_step
-        self.__s2p_cnt =0
+        self.__s2p_cnt = 0
         return matrix, frequencies
     
 if __name__ == "__main__":

@@ -537,9 +537,9 @@ def Vizualizer(matrix, f, z0):
     z_ref = z0
 
 
-# Configuración de customtkinter
-ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
-ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
+    # Configuración de customtkinter
+    ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
+    ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
 
     # Crear la ventana principal
     ventana_4 = ctk.CTk()
@@ -584,4 +584,3 @@ ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dar
     boton_mostrar = ctk.CTkButton(ventana_4, text="Mostrar Matriz", command=mostrar)
 
     ventana_4.mainloop()
-

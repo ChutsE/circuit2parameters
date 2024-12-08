@@ -536,7 +536,6 @@ def Vizualizer(matrix, f, z0):
     frecuencias = f
     z_ref = z0
 
-
     # Configuración de customtkinter
     ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
     ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"

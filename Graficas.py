@@ -3,19 +3,86 @@ import matplotlib.pyplot as plt
 import skrf as rf
 import customtkinter as ctk
 from tkinter import ttk, messagebox
+from tkinter import filedialog, messagebox
 
+#Funcion que convierte de RI a MA
+def ri2ma(complejos):
+    """
+    Convierte números complejos a magnitud y ángulo en grados.
+    
+    :param complejos: Número complejo, lista o array de números complejos.
+    :return: Tupla (magnitudes, ángulos) donde:
+             - magnitudes: Magnitud de los números complejos.
+             - ángulos: Ángulo en grados de los números complejos.
+    """
+    # Calcular magnitud y ángulo
+    magnitudes = np.abs(complejos)
+    angulos = np.angle(complejos, deg=True)
+    
+    resultado = [(m, a) for m, a in zip(magnitudes, angulos)]
+
+    return resultado
 
 # Función para mostrar la matriz seleccionada
 def mostrar():
     # Obtener el nombre de la matriz seleccionada
     matriz_seleccionada = combobox_matrices.get()
+    opcion_conversion = box_mostrar.get()
 
     if matriz_seleccionada in matrices:
         matriz_valores = matrices[matriz_seleccionada]
-        mostrar_ventana_matriz(matriz_seleccionada, matriz_valores, freq)
+        
+        if opcion_conversion == "MA":
+            matriz_valores = ri2ma(matriz_valores)
+        elif opcion_conversion == "RI":
+            matriz_valores = matriz_valores
+        else:
+            messagebox.showinfo("Error", "Selecciona una opción válida")
+            return
+        mostrar_ventana_matriz(matriz_seleccionada, matriz_valores, frecuencias)
     else:
-        ctk.CTkMessagebox.show_info("Error", "Selecciona una matriz válida")
+        messagebox.showinfo("Error", "Selecciona una matriz válida")
 
+#Funcion para seleccionar entre leer y graficar
+def toggle_display():
+    global toggle_dis   
+    """Controla la visibilidad de los botones según los checkboxes activos."""
+    if i_chckbx_read.get():
+        i_chckbx_plot.set(False)
+        hide_plot()   
+        show_read()
+        toggle_dis = 1
+    elif i_chckbx_plot.get():
+        i_chckbx_read.set(False)  # Desactiva el otro checkbox
+        hide_read()
+        show_plot()
+        toggle_dis = 0
+    else:
+        hide_plot()     
+        hide_read()
+    #Ajustar tamaño automáticamente después de cambiar el contenido
+    ventana_4.update_idletasks()
+
+#Función para mostrar botones de lectura
+def show_read():
+    box_mostrar.grid(row=3, column=0, padx=10, pady=10)
+    boton_mostrar.grid(row=4, column=0, padx=10, pady=10)
+    
+#Función para ocultar botones de lectura
+def hide_read():
+    box_mostrar.grid_forget()
+    boton_mostrar.grid_forget()
+    
+#Función para mostrar botones de graficación
+def show_plot():
+    sel_plot.grid(row=3, column=0, padx=10, pady=10)
+    boton_graficar.grid(row=4, column=0, padx=10, pady=10)
+
+#Función para ocultar botones de graficación
+def hide_plot():
+    sel_plot.grid_forget()
+    boton_graficar.grid_forget()
+    
 # Función para crear la ventana emergente que muestra la matriz
 def mostrar_ventana_matriz(nombre, matriz, freqs):
     ventana_matriz = ctk.CTkToplevel()  # Crear una ventana secundaria
@@ -175,7 +242,6 @@ def parameter2img(parameter):
     
     return img
 
-
 # Función para graficar las magnitudes de las posiciones (1,1), (1,2), (2,1) y (2,2) de cada matriz
 def plot_mag(matriz_seleccionada, freq):
 
@@ -193,33 +259,29 @@ def plot_mag(matriz_seleccionada, freq):
         fig.suptitle('Magnitud vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, mag_1_1, marker='.', label='Posición (1,1)')
+        axs[0, 0].plot(freq, mag_1_1, marker='o', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Magnitud')
         axs[0, 0].legend()
-        axs[0, 0].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
 
-        axs[0, 1].plot(freq, mag_1_2, marker='.', label='Posición (1,2)')
+        axs[0, 1].plot(freq, mag_1_2, marker='o', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Magnitud')
         axs[0, 1].legend()
-        axs[0, 1].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
 
-        axs[1, 0].plot(freq, mag_2_1, marker='.', label='Posición (2,1)')
+        axs[1, 0].plot(freq, mag_2_1, marker='o', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Magnitud')
         axs[1, 0].legend()
-        axs[1, 0].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
 
-        axs[1, 1].plot(freq, mag_2_2, marker='.', label='Posición (2,2)')
+        axs[1, 1].plot(freq, mag_2_2, marker='o', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Magnitud')
         axs[1, 1].legend()
-        axs[1, 1].set_xlim([min(freq), max(freq)])  # Modificar rango del eje x
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -244,33 +306,29 @@ def plot_Phase(matriz_seleccionada, freq):
         fig.suptitle('Fase vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, Phase_1_1, marker='.', label='Posición (1,1)')
+        axs[0, 0].plot(freq, Phase_1_1, marker='o', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Fase')
         axs[0, 0].legend()
-        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[0, 1].plot(freq, Phase_1_2, marker='.', label='Posición (1,2)')
+        axs[0, 1].plot(freq, Phase_1_2, marker='o', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Fase')
         axs[0, 1].legend()
-        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 0].plot(freq, Phase_2_1, marker='.', label='Posición (2,1)')
+        axs[1, 0].plot(freq, Phase_2_1, marker='o', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Fase')
         axs[1, 0].legend()
-        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 1].plot(freq, Phase_2_2, marker='.', label='Posición (2,2)')
+        axs[1, 1].plot(freq, Phase_2_2, marker='o', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Fase')
         axs[1, 1].legend()
-        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -295,33 +353,29 @@ def plot_dB(matriz_seleccionada, freq):
         fig.suptitle('dB vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, dB_1_1, marker='.', label='Posición (1,1)')
+        axs[0, 0].plot(freq, dB_1_1, marker='o', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Fase')
         axs[0, 0].legend()
-        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[0, 1].plot(freq, dB_1_2, marker='.', label='Posición (1,2)')
+        axs[0, 1].plot(freq, dB_1_2, marker='o', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Fase')
         axs[0, 1].legend()
-        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 0].plot(freq, dB_2_1, marker='.', label='Posición (2,1)')
+        axs[1, 0].plot(freq, dB_2_1, marker='o', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Fase')
         axs[1, 0].legend()
-        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 1].plot(freq, dB_2_2, marker='.', label='Posición (2,2)')
+        axs[1, 1].plot(freq, dB_2_2, marker='o', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Fase')
         axs[1, 1].legend()
-        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -347,33 +401,29 @@ def plot_real(matriz_seleccionada, freq):
         fig.suptitle('Real vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, real_1_1, marker='.', label='Posición (1,1)')
+        axs[0, 0].plot(freq, real_1_1, marker='o', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Real')
         axs[0, 0].legend()
-        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[0, 1].plot(freq, real_1_2, marker='.', label='Posición (1,2)')
+        axs[0, 1].plot(freq, real_1_2, marker='o', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Real')
         axs[0, 1].legend()
-        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 0].plot(freq, real_2_1, marker='.', label='Posición (2,1)')
+        axs[1, 0].plot(freq, real_2_1, marker='o', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Real')
         axs[1, 0].legend()
-        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 1].plot(freq, real_2_2, marker='.', label='Posición (2,2)')
+        axs[1, 1].plot(freq, real_2_2, marker='o', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Real')
         axs[1, 1].legend()
-        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -399,33 +449,29 @@ def plot_img(matriz_seleccionada, freq):
         fig.suptitle('Imaginario vs Frecuencia para cada posición', fontsize=16)
 
         # Graficar cada posición
-        axs[0, 0].plot(freq, img_1_1, marker='.', label='Posición (1,1)')
+        axs[0, 0].plot(freq, img_1_1, marker='o', label='Posición (1,1)')
         axs[0, 0].set_title('Posición (1,1)')
         axs[0, 0].set_xlabel('Frecuencia (Hz)')
         axs[0, 0].set_ylabel('Imaginario')
         axs[0, 0].legend()
-        axs[0, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[0, 1].plot(freq, img_1_2, marker='.', label='Posición (1,2)')
+        axs[0, 1].plot(freq, img_1_2, marker='o', label='Posición (1,2)')
         axs[0, 1].set_title('Posición (1,2)')
         axs[0, 1].set_xlabel('Frecuencia (Hz)')
         axs[0, 1].set_ylabel('Imaginario')
         axs[0, 1].legend()
-        axs[0, 1].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 0].plot(freq, img_2_1, marker='.', label='Posición (2,1)')
+        axs[1, 0].plot(freq, img_2_1, marker='o', label='Posición (2,1)')
         axs[1, 0].set_title('Posición (2,1)')
         axs[1, 0].set_xlabel('Frecuencia (Hz)')
         axs[1, 0].set_ylabel('Imaginario')
         axs[1, 0].legend()
-        axs[1, 0].set_xlim([min(freq), max(freq)]) 
 
-        axs[1, 1].plot(freq, img_2_2, marker='.', label='Posición (2,2)')
+        axs[1, 1].plot(freq, img_2_2, marker='o', label='Posición (2,2)')
         axs[1, 1].set_title('Posición (2,2)')
         axs[1, 1].set_xlabel('Frecuencia (Hz)')
         axs[1, 1].set_ylabel('Imaginario')
         axs[1, 1].legend()
-        axs[1, 1].set_xlim([min(freq), max(freq)]) 
         
         # Ajustar diseño para evitar superposición
         plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -450,19 +496,19 @@ def plot_polar(matriz_seleccionada, freq):
     fig.suptitle('Fases en Coordenadas Polares para cada Posición', fontsize=16)
 
     # Graficar cada posición en su propio subgráfico
-    axs[0, 0].plot(fases_1_1, freq, marker='.', label='Posición (1,1)')
+    axs[0, 0].plot(fases_1_1, freq, marker='o', label='Posición (1,1)')
     axs[0, 0].set_title('Posición (1,1)', va='bottom')
     axs[0, 0].legend(loc='upper right')
 
-    axs[0, 1].plot(fases_1_2, freq, marker='.', label='Posición (1,2)')
+    axs[0, 1].plot(fases_1_2, freq, marker='o', label='Posición (1,2)')
     axs[0, 1].set_title('Posición (1,2)', va='bottom')
     axs[0, 1].legend(loc='upper right')
 
-    axs[1, 0].plot(fases_2_1, freq, marker='.', label='Posición (2,1)')
+    axs[1, 0].plot(fases_2_1, freq, marker='o', label='Posición (2,1)')
     axs[1, 0].set_title('Posición (2,1)', va='bottom')
     axs[1, 0].legend(loc='upper right')
 
-    axs[1, 1].plot(fases_2_2, freq, marker='.', label='Posición (2,2)')
+    axs[1, 1].plot(fases_2_2, freq, marker='o', label='Posición (2,2)')
     axs[1, 1].set_title('Posición (2,2)', va='bottom')
     axs[1, 1].legend(loc='upper right')
 
@@ -621,67 +667,122 @@ def graficar():
     except Exception as e:
         messagebox.showerror("Error", f"Hubo un error al graficar: {e}")
 
+#Funcion para guardar archivo s2p
+def guardar():
+    # Crear una nueva ventana
+    ventana_guardar = ctk.CTkToplevel(ventana_4)
+    ventana_guardar.title("Guardar como")
+    ventana_guardar.geometry("300x150")
 
+    # Etiqueta para el campo de entrada
+    label = ctk.CTkLabel(ventana_guardar, text="Nombre del archivo:")
+    label.grid(row=0, column=0, pady=10)
+
+    # Campo de entrada para el nombre del archivo
+    nombre_entry = ctk.CTkEntry(ventana_guardar, placeholder_text="Escribe el nombre del archivo")
+    nombre_entry.grid(row=0, column=1,pady=10, padx=20)
+    # Botón Descargar
+    descargar_boton = ctk.CTkButton(
+        ventana_guardar,
+        text="Descargar",
+        command=lambda: download_s2p(matrices, frecuencias, nombre_entry.get()),
+        )
+    descargar_boton.grid(row=1, column=0, pady=10)
+
+#Función para crear archivo s2p
+def s2p_file(matrices, frecuencias, filename):
+    if "S" not in matrices:
+        raise ValueError("No se encontró la matriz S en el diccionario.")
+    try:
+        with open(filename, "w") as file:
+            # Escribir la resistencia de referencia
+            file.write(f"! S2P File: Measurements: S11, S21, S12, S22\n")
+            file.write(f"# Hz S RI R {int(z_ref)}\n") #Parámetros S, formato RI, resistencia de referencia
+            # Escribir los parámetros S
+            for idx, frecuencia in enumerate(frecuencias):
+                s = matrices["S"][idx]
+                file.write(f"{frecuencia} {s[0, 0].real} {s[0, 0].imag} {s[1, 0].real} {s[1, 0].imag} {s[0, 1].real} {s[0, 1].imag} {s[1, 1].real} {s[1, 1].imag}\n")
+                messagebox.showinfo("Archivo Guardado", f"Se ha guardado el archivo: {filename}")
+        return True
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al guardar el archivo: {e}")
+        return False
+    
+#Función para descargar archivo s2p
+def download_s2p(matrices, frecuencias, filename):
+    if not filename:
+        messagebox.showerror("Error", "El nombre del archivo no puede estar vacío.")
+        return
+    
+    file = filedialog.asksaveasfilename(initialfile=f"{filename}.s2p", defaultextension=".s2p", filetypes=[("S2P Files", "*.s2p"), ("Todos los archivos", "*.*")])
+    
+    if file:
+        s2p_file(matrices, frecuencias, file)
+
+    
 # Lista de frecuencias
-#frecuencias = [1e6, 5e6, 10e6, 50e6, 100e6]  # Frecuencias en Hz
+frecuencias = [1e6, 5e6, 10e6, 50e6, 100e6]  # Frecuencias en Hz
 
 # Diccionario de matrices dependientes de frecuencia
-#matrices = {
-#    "Z": [np.array([[1 + 1j * f, 2 + 0.5j * f], [3 - 0.5j * f, 4 + 1j * f]]) for f in frecuencias],
-#    "Y": [np.array([[0.5 - 0.2j * f, 1.5 + 0.3j * f], [-0.5 + 0.7j * f, 0.7 - 0.4j * f]]) for f in frecuencias],
-#    "ABCD": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
-#    "S": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
-#}
+matrices = {
+    "Z": [np.array([[1 + 1j * f, 2 + 0.5j * f], [3 - 0.5j * f, 4 + 1j * f]]) for f in frecuencias],
+    "Y": [np.array([[0.5 - 0.2j * f, 1.5 + 0.3j * f], [-0.5 + 0.7j * f, 0.7 - 0.4j * f]]) for f in frecuencias],
+    "ABCD": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
+    "S": [np.array([[2 + 0.5j * f, 1 - 0.3j * f], [-1 + 0.2j * f, 3 - 0.6j * f]]) for f in frecuencias],
+}
 
-def Vizualizer(matrix, f): 
-    global s2p_params, s2p_freq, z_ref, combobox_matrices, sel_plot, boton_graficar, boton_mostrar, ventana_4, freq, matrices, frecuencias
+#Archivo s2p
+filename = 'Line.s2p'
+s2p_freq, s2p_params, z_ref = read_s2p(filename)
 
-    matrices = matrix
-    freq = f
-    frecuencias = f
-    #Archivo s2p
-    filename = 'Line.s2p'
-    s2p_freq, s2p_params, z_ref = read_s2p(filename)
+#Agregar archivo s2p al diccionario de matrices
+matrices['Archivo S2P'] = s2p_params
 
-    #Agregar archivo s2p al diccionario de matrices
-    #matrices['Archivo S2P'] = s2p_params
+# Configuración de customtkinter
+ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
+ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
 
-    # Configuración de customtkinter
-    ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
-    ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
+# Crear la ventana principal
+ventana_4 = ctk.CTk()
+ventana_4.title("Resultados")
+ventana_4.geometry("700x500")
 
-    # Crear la ventana principal
-    ventana_4 = ctk.CTk()
-    ventana_4.title("Resultados")
-    ventana_4.geometry("400x300")
+# Etiqueta informativa
+etiqueta = ctk.CTkLabel(ventana_4, text="Selecciona una matriz y la acción que desea realizar.")
+etiqueta.grid(row=0, column=0, columnspan=6, pady=10)
+i_chckbx_read = ctk.BooleanVar()
+i_chckbx_plot = ctk.BooleanVar()
 
-    # Etiqueta informativa
-    etiqueta = ctk.CTkLabel(ventana_4, text="Selecciona una matriz y la acción que desea realizar. Si desea graficar, seleccione también el tipo de gráfica")
-    etiqueta.pack(pady=10)
+# Combobox para seleccionar la matriz
+combobox_matrices = ctk.CTkComboBox(ventana_4, values=list(matrices.keys()))
+combobox_matrices.set(list(matrices.keys())[0])  # Seleccionar la primera opción por defecto
+combobox_matrices.grid(row=1, column=0, columnspan=3, sticky="w", pady=5)
 
-    # Combobox para seleccionar la matriz
-    combobox_matrices = ctk.CTkComboBox(ventana_4, values=list(matrices.keys()))
-    combobox_matrices.set(list(matrices.keys())[0])  # Seleccionar la primera opción por defecto
-    combobox_matrices.pack(pady=10)
+# Crear el checkbox
+chckbx_read = ctk.CTkCheckBox(ventana_4, text="Leer Parámetros", variable=i_chckbx_read, command=toggle_display)
+chckbx_read.grid(row=1, column=4, sticky="w", pady=5)
+chckbx_plot = ctk.CTkCheckBox(ventana_4, text="Graficar", variable=i_chckbx_plot, command=toggle_display)
+chckbx_plot.grid(row=1, column=5, sticky="w", pady=5)
 
-    # Crear un combobox (selector) para elegir el tipo de gráfica
-    sel_plot = ctk.CTkComboBox(
-        ventana_4,
-        values=["Magnitud vs Frecuencia", "Fase vs Frecuencia", 
-                "dB vs Frecuencia", "Real vs Frecuencia", 
-                "Imaginario vs Frecuencia", "Gráfica Polar", "Carta de Smith"]
-    )
-    sel_plot.set("Magnitud vs Frecuencia")  # Valor predeterminado
-    sel_plot.pack(pady=10)
+#Botón para guardar archivo s2p
+boton_guardar = ctk.CTkButton(ventana_4, text="Guardar", command=guardar)
+boton_guardar.grid(row=1, column=6, sticky="w", pady=5)
 
-    # Botón para graficar
-    boton_graficar = ctk.CTkButton(ventana_4, text="Graficar", command=graficar)
-    boton_graficar.pack(pady=20)
+# Crear un combobox (selector) para elegir el tipo de gráfica
+sel_plot = ctk.CTkComboBox(
+    ventana_4,
+    values=["Magnitud vs Frecuencia", "Fase vs Frecuencia", 
+            "dB vs Frecuencia", "Real vs Frecuencia", 
+            "Imaginario vs Frecuencia", "Gráfica Polar", "Carta de Smith"]
+)
+sel_plot.set("Magnitud vs Frecuencia")  # Valor predeterminado
 
-    # Botón para mostrar la matriz seleccionada
-    boton_mostrar = ctk.CTkButton(ventana_4, text="Mostrar Matriz", command=mostrar)
-    boton_mostrar.pack(pady=20)
+# Botón para graficar
+boton_graficar = ctk.CTkButton(ventana_4, text="Graficar", command=graficar)
 
-    # Iniciar la GUI
-    ventana_4.mainloop()
+# Botón para mostrar la matriz seleccionada
+box_mostrar = ctk.CTkComboBox(ventana_4, values=["RI","MA"])
+boton_mostrar = ctk.CTkButton(ventana_4, text="Mostrar Matriz", command=mostrar)
 
+# Iniciar la GUI
+ventana_4.mainloop()

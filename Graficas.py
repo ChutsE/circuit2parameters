@@ -28,9 +28,36 @@ def mostrar():
     # Obtener el nombre de la matriz seleccionada
     matriz_seleccionada = combobox_matrices.get()
     opcion_conversion = box_mostrar.get()
+    opcion_conversion = box_mostrar.get()
 
     if matriz_seleccionada in matrices:
         matriz_valores = matrices[matriz_seleccionada]
+        
+        if opcion_conversion == "MA":
+            matriz_valores = ri2ma(matriz_valores)
+        elif opcion_conversion == "RI":
+            matriz_valores = matriz_valores
+        else:
+            messagebox.showinfo("Error", "Selecciona una opción válida")
+            return
+        mostrar_ventana_matriz(matriz_seleccionada, matriz_valores, frecuencias)
+    else:
+        messagebox.showinfo("Error", "Selecciona una matriz válida")
+
+#Funcion para seleccionar entre leer y graficar
+def toggle_display():
+    global toggle_dis   
+    """Controla la visibilidad de los botones según los checkboxes activos."""
+    if i_chckbx_read.get():
+        i_chckbx_plot.set(False)
+        hide_plot()   
+        show_read()
+        toggle_dis = 1
+    elif i_chckbx_plot.get():
+        i_chckbx_read.set(False)  # Desactiva el otro checkbox
+        hide_read()
+        show_plot()
+        toggle_dis = 0
         
         if opcion_conversion == "MA":
             matriz_valores = ri2ma(matriz_valores)
@@ -510,9 +537,9 @@ def Vizualizer(matrix, f, z0):
     z_ref = z0
 
 
-    # Configuración de customtkinter
-    ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
-    ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
+# Configuración de customtkinter
+ctk.set_appearance_mode("Dark")  # Modo de apariencia: "Light", "Dark", "System"
+ctk.set_default_color_theme("dark-blue")  # Tema de color: "blue", "green", "dark-blue"
 
     # Crear la ventana principal
     ventana_4 = ctk.CTk()

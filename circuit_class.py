@@ -19,19 +19,27 @@ class Circuit:
         self.abcd_matrix = None
         self.s_matrix = None
         self.__s2p_cnt = 0
-        
+    
+    def s2z(self):
+        I = np.eye(2, dtype=complex)
+        self.s2p_z_matrix = self._z_charac * np.dot( I + self._s2p_device[self.__s2p_cnt], np.linalg.inv(I - self._s2p_device[self.__s2p_cnt]))
+        self.__s2p_cnt += 1
+
+        self.s2p_y_matrix = np.linalg.inv(self.s2p_z_matrix)
+        print(self.s2p_y_matrix)
+
     def s2p_to_components(self):
 
         Za, Zb, Zc = self.__ABCD_2Port(self.__S2ABCD(self._s2p_device[self.__s2p_cnt]))
 
         if len(self._s2p_nodes) == 3:
             self._components.append(["Z", Za, int(self._s2p_nodes[2]), int(self._s2p_nodes[0])])
-            self._components.append(["Z", Zb, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
-            self._components.append(["Z", Zc, int(self._s2p_nodes[1]), int(self._s2p_nodes[2])])
+            self._components.append(["Z", Zc, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zb, int(self._s2p_nodes[1]), int(self._s2p_nodes[2])])
         elif len(self._s2p_nodes) == 2:
             self._components.append(["Z", Za, int(self._s2p_nodes[0])])
-            self._components.append(["Z", Zb, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
-            self._components.append(["Z", Zc, int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zc, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zb, int(self._s2p_nodes[1])])
         self.__s2p_cnt += 1
 
 
@@ -58,7 +66,7 @@ class Circuit:
             
         abcd_mat[0] = complex(((1+s11) * (1-s22) + (s12*s21)) / (denom))
         abcd_mat[1] = complex(self._z_charac * ((1+s11) * (1+s22) - (s12*s21)) / (denom))
-        abcd_mat[2] = complex((1/self._z_charac) * ((1+s11) * (1+s22) - (s12*s21)) / (denom)) 
+        abcd_mat[2] = complex((1/self._z_charac) * ((1-s11) * (1-s22) - (s12*s21)) / (denom)) 
         abcd_mat[3] = complex(((1-s11) * (1+s22) + (s12*s21)) / (denom))
         
         return abcd_mat
@@ -335,7 +343,7 @@ class Circuit:
 
             self._frecuency += self._freq_step
         self.__s2p_cnt = 0
-        return matrix, frequencies
+        return matrix, frequencies, self._z_charac
     
 if __name__ == "__main__":
     

@@ -241,12 +241,12 @@ def save_comp_inf():
                           s2p_nodes = nodos_s2p_lista,
                           )
         try:
-            matrix, frequencies = circuit.run_simulation()
+            matrix, frequencies, z_ref = circuit.run_simulation()
         except Exception as e:
             messagebox.showerror("ERROR", f"Ocurrió un error al simular el circuito: {e}")
         else:
             messagebox.showinfo("INFO", f"Se ha simulado el circuito correctamente")
-            Vizualizer(matrix, frequencies)
+            Vizualizer(matrix, frequencies, z_ref)
     else:
         messagebox.showwarning("Advertencia", "No se ha ingresado suficiente información.")
         return

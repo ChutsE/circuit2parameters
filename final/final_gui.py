@@ -94,11 +94,22 @@ def read_s2p(filename):
                         raise ValueError("El formato de la línea de encabezado no es válido.")
                     continue
                 
+                if freq_type == 'GHz':
+                    freq_multiplier = 1e9
+                elif freq_type == 'MHz':
+                    freq_multiplier = 1e6
+                elif freq_type == 'KHz':
+                    freq_multiplier = 1e3
+                elif freq_type == 'Hz':
+                    freq_multiplier = 1
+                else:
+                    raise ValueError("Unidad de frecuencia no válida.")
+                    
                 # Procesa los datos de los parámetros S
                 parts = line.split()
                 if len(parts) >= 9:
                     try:
-                        freq = float(parts[0])
+                        freq = freq_multiplier*float(parts[0])
                         s11 = complex(float(parts[1]), float(parts[2]))
                         s21 = complex(float(parts[3]), float(parts[4]))
                         s12 = complex(float(parts[5]), float(parts[6]))

@@ -20,13 +20,6 @@ class Circuit:
         self.s_matrix = None
         self.__s2p_cnt = 0
     
-    def s2z(self):
-        I = np.eye(2, dtype=complex)
-        self.s2p_z_matrix = self._z_charac * np.dot( I + self._s2p_device[self.__s2p_cnt], np.linalg.inv(I - self._s2p_device[self.__s2p_cnt]))
-        self.__s2p_cnt += 1
-
-        self.s2p_y_matrix = np.linalg.inv(self.s2p_z_matrix)
-        print(self.s2p_y_matrix)
 
     def s2p_to_components(self):
 
@@ -34,12 +27,12 @@ class Circuit:
 
         if len(self._s2p_nodes) == 3:
             self._components.append(["Z", Za, int(self._s2p_nodes[2]), int(self._s2p_nodes[0])])
-            self._components.append(["Z", Zc, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
-            self._components.append(["Z", Zb, int(self._s2p_nodes[1]), int(self._s2p_nodes[2])])
+            self._components.append(["Z", Zb, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zc, int(self._s2p_nodes[1]), int(self._s2p_nodes[2])])
         elif len(self._s2p_nodes) == 2:
             self._components.append(["Z", Za, int(self._s2p_nodes[0])])
-            self._components.append(["Z", Zc, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
-            self._components.append(["Z", Zb, int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zb, int(self._s2p_nodes[0]), int(self._s2p_nodes[1])])
+            self._components.append(["Z", Zc, int(self._s2p_nodes[1])])
         self.__s2p_cnt += 1
 
 
@@ -94,7 +87,7 @@ class Circuit:
                 
             self._components_nodes.append(sorted(nodes))
 
-    def equivalent_circuit(self):
+    def serial_paralel_reduction(self):
         """Find the equivalent circuit for a circuit."""
         parallel_components_set = self.__paralel_branch_finder()
         serial_components_set = self.__serial_branch_finder()
@@ -188,7 +181,6 @@ class Circuit:
         """Convert the components to nodes."""
 
         nodes = []
-        print(self._components_nodes)
         for node_num in range(len(self._components_nodes) + 1):
             node  = [component_num for component_num, component in enumerate(self._components_nodes) if node_num in component]
             if node_num in self._input_nodes:
@@ -202,8 +194,6 @@ class Circuit:
         circuit_matrix_len = len(self._nodes_matrix)
         self._circuit_matrix = np.zeros((circuit_matrix_len, circuit_matrix_len), dtype=complex)
         
-        print(self._nodes_matrix)
-        print(self._components_values)
         for j in range(circuit_matrix_len):
             for i in range(circuit_matrix_len):
                 if i == j:
@@ -329,7 +319,7 @@ class Circuit:
             if self._s2p_device:
                 self.s2p_to_components()
             self.impedance_calculator()
-            self.equivalent_circuit()
+            self.serial_paralel_reduction()
             self.components_to_node()
             self.get_circuit_matrix()
             self.get_y_matrix()

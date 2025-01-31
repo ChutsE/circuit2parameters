@@ -185,7 +185,7 @@ def plot_mag(matriz_seleccionada, freq):
         for i in range(n):
             for j in range(n):
                 mag = [np.abs(matriz[i, j]) for matriz in matriz_valores]
-                axs[i, j].plot(freq, mag, marker='.', label=f'Mag({i+1},{j+1})')
+                axs[i, j].plot(freq, mag, label=f'Mag({i+1},{j+1})')
                 axs[i, j].set_title(f'Mag({i+1},{j+1})')
                 axs[i, j].set_xlabel('Frecuencia (Hz)')
                 axs[i, j].set_ylabel('Magnitud')
@@ -213,7 +213,7 @@ def plot_Phase(matriz_seleccionada, freq):
         for i in range(n):
             for j in range(n):
                 phase = [parameter2Phase(matriz[i, j]) for matriz in matriz_valores]
-                axs[i, j].plot(freq, phase, marker='.', label=f'Fase({i+1},{j+1})')
+                axs[i, j].plot(freq, phase, label=f'Fase({i+1},{j+1})')
                 axs[i, j].set_title(f'Fase({i+1},{j+1})')
                 axs[i, j].set_xlabel('Frecuencia (Hz)')
                 axs[i, j].set_ylabel('Fase')
@@ -241,7 +241,7 @@ def plot_dB(matriz_seleccionada, freq):
         for i in range(n):
             for j in range(n):
                 dB = [parameter2dB(matriz[i, j]) for matriz in matriz_valores]
-                axs[i, j].plot(freq, dB, marker='.', label=f'dB({i+1},{j+1})')
+                axs[i, j].plot(freq, dB, label=f'dB({i+1},{j+1})')
                 axs[i, j].set_title(f'dB({i+1},{j+1})')
                 axs[i, j].set_xlabel('Frecuencia (Hz)')
                 axs[i, j].set_ylabel('dB')
@@ -268,7 +268,7 @@ def plot_dB_vs_dB(matriz_seleccionada, freq):
         for i in range(n):
             for j in range(n):
                 dB = [parameter2dB(matriz[i, j]) for matriz in matriz_valores]
-                axs[i, j].plot(freq, dB, marker='.', label=f'dB({i+1},{j+1})')
+                axs[i, j].plot(freq, dB, label=f'dB({i+1},{j+1})')
                 axs[i, j].set_title(f'dB({i+1},{j+1})')
                 axs[i, j].set_xlabel('Frecuencia (Hz)')
                 axs[i, j].set_ylabel('dB')
@@ -297,7 +297,7 @@ def plot_real(matriz_seleccionada, freq):
         for i in range(n):
             for j in range(n):
                 real = [parameter2real(matriz[i, j]) for matriz in matriz_valores]
-                axs[i, j].plot(freq, real, marker='.', label=f'Re({i+1},{j+1})')
+                axs[i, j].plot(freq, real, label=f'Re({i+1},{j+1})')
                 axs[i, j].set_title(f'Re({i+1},{j+1})')
                 axs[i, j].set_xlabel('Frecuencia (Hz)')
                 axs[i, j].set_ylabel('Real')
@@ -325,7 +325,7 @@ def plot_img(matriz_seleccionada, freq):
         for i in range(n):
             for j in range(n):
                 img = [parameter2img(matriz[i, j]) for matriz in matriz_valores]
-                axs[i, j].plot(freq, img, marker='.', label=f'Im({i+1},{j+1})')
+                axs[i, j].plot(freq, img, label=f'Im({i+1},{j+1})')
                 axs[i, j].set_title(f'Im({i+1},{j+1})')
                 axs[i, j].set_xlabel('Frecuencia (Hz)')
                 axs[i, j].set_ylabel('Imaginario')
@@ -373,7 +373,7 @@ def plot_polar(matriz_seleccionada):
             for j in range(n):
                 mag = [np.abs(matriz[i, j]) for matriz in matriz_valores]
                 phase = [np.angle(matriz[i, j]) for matriz in matriz_valores]
-                axs[i, j].plot(phase, mag, marker='.', label=f'Polar({i+1},{j+1})')
+                axs[i, j].plot(phase, mag, label=f'Polar({i+1},{j+1})')
                 axs[i, j].set_title(f'Polar({i+1},{j+1})')
                 axs[i, j].legend()
 

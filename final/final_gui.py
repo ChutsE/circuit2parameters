@@ -92,24 +92,22 @@ def read_s2p(filename):
                         z_ref = float(header_parts[5])
                     except (IndexError, ValueError):
                         raise ValueError("El formato de la línea de encabezado no es válido.")
-                    continue
-                
-                if freq_type == 'GHz':
-                    freq_multiplier = 1e9
-                elif freq_type == 'MHz':
-                    freq_multiplier = 1e6
-                elif freq_type == 'KHz':
-                    freq_multiplier = 1e3
-                elif freq_type == 'Hz':
-                    freq_multiplier = 1
-                else:
-                    raise ValueError("Unidad de frecuencia no válida.")
-                    
+                    else:
+                        freq_type = freq_type.upper().replace('HZ', '')
+                        if freq_type == "K":
+                            freq_type = 1e3
+                        elif freq_type == "M":
+                            freq_type = 1e6
+                        elif freq_type == "G":
+                            freq_type = 1e9
+                        else:
+                            freq_type = 1
+                        continue
                 # Procesa los datos de los parámetros S
                 parts = line.split()
                 if len(parts) >= 9:
                     try:
-                        freq = freq_multiplier*float(parts[0])
+                        freq = float(parts[0])
                         s11 = complex(float(parts[1]), float(parts[2]))
                         s21 = complex(float(parts[3]), float(parts[4]))
                         s12 = complex(float(parts[5]), float(parts[6]))
@@ -118,10 +116,10 @@ def read_s2p(filename):
                         raise ValueError("El formato de los datos de parámetros S no es válido.")
                     
                     #Matriz S para determinada frecuencia
-                    matriz_s = np.array([[s11, s12], [s21, s22]], dtype=complex)
+                    matriz_s = np.array([[s11, s21], [s12, s22]], dtype=complex)
                     
                     #Guardar la frecuencia y la matriz
-                    frequencies.append(freq)
+                    frequencies.append(freq_type*freq)
                     s_parameters.append(matriz_s)
 
         # Verifica que se haya leído la resistencia de referencia

@@ -2,7 +2,7 @@ import numpy as np
 
 class Circuit:
     
-    def __init__(self, components: list, input_nodes: list, lower_freq_limit: float, upper_freq_limit: float, freq_step: float, z_charac: float, s2p_device: list = None, s2p_nodes: list = None):
+    def __init__(self, components: list, input_nodes: list, lower_freq_limit: float, upper_freq_limit: float, freq_step: float, z_charac: float, s2p_device: list = None, s2p_nodes: list = []):
         self._components = components
         self._input_nodes = input_nodes
         self._frecuency = lower_freq_limit
@@ -20,10 +20,76 @@ class Circuit:
         self.s_matrix = None
         self.__s2p_cnt = 0
     
+    def components_divider(self):
+        """Divide the components in the circuit."""
+        self._s2p_nodes = [int(node) for node in self._s2p_nodes]
 
+        total_nodes_in = self._input_nodes + self._s2p_nodes
+        total_nodes_in = set(total_nodes_in)
+
+        node_threshold_1 = self._s2p_nodes[0]
+        node_threshold_2 = self._s2p_nodes[1]
+
+        #identify the components in the malla_1 and malla_2
+        self.malla_1 = set()
+        self.malla_2 = set()
+        for component_num, nodes in enumerate(self._components_nodes):
+            for node in nodes:
+                if node <= node_threshold_1:
+                    self.malla_1.add(component_num)
+                elif node >= node_threshold_2:
+                    self.malla_2.add(component_num)
+
+        
+        self.in_nodes_1 = [node for node in total_nodes_in if node <= node_threshold_1]
+        self.in_nodes_2 = [node for node in total_nodes_in if node >= node_threshold_2]
+
+
+        self.components_values_malla_1 = []
+        self.components_nodes_malla_1 = []
+        for component_num in self.malla_1:
+            self.components_values_malla_1.append(self._components_values[component_num])
+            self.components_nodes_malla_1.append(self._components_nodes[component_num])
+        
+        self.components_values_malla_2 = []
+        self.components_nodes_malla_2 = []
+        for component_num in self.malla_2:
+            self.components_values_malla_2.append(self._components_values[component_num])
+            self.components_nodes_malla_2.append(self._components_nodes[component_num])
+
+    def y2abcd(self):          
+            y11 = self.y_matrix[0,0]
+            y12 = self.y_matrix[0,1]
+            y21 = self.y_matrix[1,0]
+            y22 = self.y_matrix[1,1]
+                
+            abcd_mat = np.zeros((2,2), dtype=complex)
+                
+            abcd_mat[0,0] = -y22/y21
+            abcd_mat[0,1] = -1/y21
+            abcd_mat[1,0] = -(y11*y22-y12*y21)/y21
+            abcd_mat[1,1] = -y11/y21
+                
+            self.abcd_matrix = abcd_mat
+
+    def abcd2y(self):      
+        A = self.abcd_matrix[0,0]
+        B = self.abcd_matrix[0,1]
+        C = self.abcd_matrix[1,0]
+        D = self.abcd_matrix[1,1]
+       
+        y_mat = np.zeros((2,2), dtype=complex)
+       
+        y_mat[0,0] = D/B
+        y_mat[0,1] = (B*C-A*D)/B
+        y_mat[1,0] = -1/B
+        y_mat[1,1] = A/B  
+
+        self.y_matrix = y_mat
+   
     def s2p_to_components(self):
 
-        Za, Zb, Zc = self.__ABCD_2Port(self.__S2ABCD(self._s2p_device[self.__s2p_cnt]))
+        Za, Zb, Zc = self.__ABCD_2PI(self.__S2ABCD(self._s2p_device[self.__s2p_cnt]))
 
         if len(self._s2p_nodes) == 3:
             self._components.append(["Z", Za, int(self._s2p_nodes[2]), int(self._s2p_nodes[0])])
@@ -35,32 +101,44 @@ class Circuit:
             self._components.append(["Z", Zc, int(self._s2p_nodes[1])])
         self.__s2p_cnt += 1
 
+    def __ABCD_2T(self, param):
+        [A, B, C, D] = param
 
-    def __ABCD_2Port(self, param):
+        Zc = complex(1 / C)
+        Za = complex((A/C) - 1/C)
+        Zb = complex((D/C) - 1/C)
+
+        return Za, Zb, Zc
+
+    def __ABCD_2PI(self, param):
 
         [A, B, C, D] = param
         
         Yc = complex(1 / B)
-        Ya = complex((D/B) - 1)
-        Yb = complex((A/B) - 1)
+        Ya = complex((D/B) - 1/B)
+        Yb = complex((A/B) - 1/B)
         
         Za = 1/Ya
         Zb = 1/Yb
         Zc = 1/Yc
+
         return Za, Zb, Zc
     
-    def __S2ABCD(self, param):
+    def __S2ABCD(self, s_matrix):
 
-        [s11, s12, s21, s22] = param
+        s11 = s_matrix[0,0]
+        s12 = s_matrix[0,1]
+        s21 = s_matrix[1,0]
+        s22 = s_matrix[1,1]
         
-        abcd_mat = [0]*4
+        abcd_mat = np.zeros((2,2), dtype=complex)
         
         denom = 2 * s21
             
-        abcd_mat[0] = complex(((1+s11) * (1-s22) + (s12*s21)) / (denom))
-        abcd_mat[1] = complex(self._z_charac * ((1+s11) * (1+s22) - (s12*s21)) / (denom))
-        abcd_mat[2] = complex((1/self._z_charac) * ((1-s11) * (1-s22) - (s12*s21)) / (denom)) 
-        abcd_mat[3] = complex(((1-s11) * (1+s22) + (s12*s21)) / (denom))
+        abcd_mat[0,0] = complex(((1+s11) * (1-s22) + (s12*s21)) / (denom))
+        abcd_mat[0,1] = complex(self._z_charac * ((1+s11) * (1+s22) - (s12*s21)) / (denom))
+        abcd_mat[1,0] = complex((1/self._z_charac) * ((1-s11) * (1-s22) - (s12*s21)) / (denom)) 
+        abcd_mat[1,1] = complex(((1-s11) * (1+s22) + (s12*s21)) / (denom))
         
         return abcd_mat
     
@@ -118,13 +196,14 @@ class Circuit:
 
     def __serial_branch_finder(self) -> list:
         """Find serial branches in a circuit."""
-
+        
         nodes_frequency = {}
         for component_nodes in self._components_nodes:
             for node in component_nodes:
                 nodes_frequency[node] = nodes_frequency.get(node, 0) + 1
         #todos los nodos en serie
         serial_nodes = [num for num, count in nodes_frequency.items() if count == 2]
+
         #elimina los nodos de entrada
         serial_nodes = [i for i in serial_nodes if i not in self._input_nodes]
         serial_components_set = []
@@ -179,13 +258,16 @@ class Circuit:
 
     def components_to_node(self):
         """Convert the components to nodes."""
-
         nodes = []
-        for node_num in range(len(self._components_nodes) + 1):
-            node  = [component_num for component_num, component in enumerate(self._components_nodes) if node_num in component]
+        max_node_num = max(max(component) for component in self._components_nodes) + 1
+
+        for node_num in range(max_node_num):
+            node = [component_num for component_num, component in enumerate(self._components_nodes) if node_num in component]
             if node_num in self._input_nodes:
                 node.append(f"In_{node_num}")
+
             nodes.append(node)
+
         self._nodes_matrix = [node for node in nodes if node]
 
     def get_circuit_matrix(self):
@@ -286,9 +368,11 @@ class Circuit:
 
     def z2s(self):
         """Convert Z matrix to S matrix."""
-        
-        z0_unitary_matrix = self._z_charac * np.eye(len(self.z_matrix), dtype=complex)
-        self.s_matrix =  np.dot(np.linalg.inv(self.z_matrix + z0_unitary_matrix), self.z_matrix - z0_unitary_matrix)
+        if self.z_matrix is None:
+            self.s_matrix = None
+        else:
+            z0_unitary_matrix = self._z_charac * np.eye(len(self.z_matrix), dtype=complex)
+            self.s_matrix =  np.dot(np.linalg.inv(self.z_matrix + z0_unitary_matrix), self.z_matrix - z0_unitary_matrix)
 
         """
         if len(self.z_matrix) == 2:
@@ -313,26 +397,98 @@ class Circuit:
         matrix["Z"] = []
         matrix["ABCD"] = []
         matrix["S"] = []
+        
+        cnt = 0
+        static_input_nodes = self._input_nodes
+
         while self._frecuency <= self._upper_freq_limit:
 
             frequencies.append(self._frecuency)
-            if self._s2p_device:
-                self.s2p_to_components()
             self.impedance_calculator()
-            self.serial_paralel_reduction()
-            self.components_to_node()
-            self.get_circuit_matrix()
-            self.get_y_matrix()
-            matrix["Y"].append(self.y_matrix)
-            self.y2z()
-            matrix["Z"].append(self.z_matrix)
-            self.z2abcd()
-            matrix["ABCD"].append(self.abcd_matrix)
-            self.z2s()
-            matrix["S"].append(self.s_matrix)
+
+            if self._s2p_device:
+                self._input_nodes = static_input_nodes
+
+                self.components_divider()
+
+                self._components_values = self.components_values_malla_1
+                self._components_nodes = self.components_nodes_malla_1
+                self._input_nodes = self.in_nodes_1
+
+                #print("components_nodes", self._components_nodes)
+                #print("components_values", self._components_values)
+                #print("input_nodes", self._input_nodes)
+
+                
+                if len(self._components_nodes) > 0:
+                    self.serial_paralel_reduction()
+                    self.components_to_node()
+                    #print("nodes_matrix", self._nodes_matrix)
+                    self.get_circuit_matrix()
+                    #print("circuit_matrix", self._circuit_matrix)
+                    self.get_y_matrix()
+                    #print("no_in_nodes", self._no_in_nodes)
+                    self.y2abcd()
+                    ABCD_1 = self.abcd_matrix
+                else:
+                    ABCD_1 = np.eye(2, dtype=complex)
+                
+
+                self._components_values = self.components_values_malla_2
+                self._components_nodes = self.components_nodes_malla_2
+                self._input_nodes = self.in_nodes_2
+
+                #print("components_nodes", self._components_nodes)
+                #print("components_values", self._components_values)
+                #print("input_nodes", self._input_nodes)
+
+                if len(self._components_nodes) > 0:
+                    self.serial_paralel_reduction()
+                    self.components_to_node()
+                    #print("nodes_matrix", self._nodes_matrix)
+                    self.get_circuit_matrix()
+                    #print("circuit_matrix", self._circuit_matrix)
+                    self.get_y_matrix()
+                    #print("no_in_nodes", self._no_in_nodes)
+                    self.y2abcd()
+                    ABCD_2 = self.abcd_matrix
+                else:                
+                    ABCD_2 = np.eye(2, dtype=complex)   
+                    
+
+                ABCD_S2P = self.__S2ABCD(self._s2p_device[cnt])
+                cnt += 1
+
+
+                ABCD_aux = np.dot(ABCD_1, ABCD_S2P)
+                self.abcd_matrix = np.dot(ABCD_aux, ABCD_2)
+
+                self.abcd2y()
+                matrix["Y"].append(self.y_matrix)
+                self.y2z()
+                matrix["Z"].append(self.z_matrix)
+                self.z2abcd()
+                matrix["ABCD"].append(self.abcd_matrix)
+                self.z2s()
+                matrix["S"].append(self.s_matrix)
+
+
+
+            else:
+                self.serial_paralel_reduction()
+                self.components_to_node()
+                self.get_circuit_matrix()
+                self.get_y_matrix()
+                matrix["Y"].append(self.y_matrix)
+                self.y2z()
+                matrix["Z"].append(self.z_matrix)
+                self.y2abcd()
+                matrix["ABCD"].append(self.abcd_matrix)
+                self.z2s()
+                matrix["S"].append(self.s_matrix)
 
             self._frecuency += self._freq_step
-        self.__s2p_cnt = 0
+
         return matrix, frequencies, self._z_charac
     
 if __name__ == "__main__":
